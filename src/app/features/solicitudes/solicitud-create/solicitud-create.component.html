@@ -1,0 +1,75 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Registrar solicitud</h1>
+      <p class="page-subtitle">Crea una solicitud académica estructurada. La identidad del solicitante se toma del JWT del backend.</p>
+    </div>
+    <a class="btn btn-secondary" routerLink="/solicitudes">Volver</a>
+  </div>
+
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Datos de la solicitud</h2>
+      <button class="btn btn-ghost" type="button" (click)="suggest()" [disabled]="suggesting" *ngIf="canSuggest()">
+        {{ suggesting ? 'Generando sugerencia...' : 'Sugerir con IA' }}
+      </button>
+    </div>
+    <div class="card-body">
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <div class="form-row">
+          <label>Tipo de solicitud</label>
+          <select formControlName="tipoSolicitud">
+            <option value="">Selecciona un tipo</option>
+            <option *ngFor="let tipo of tipos" [value]="tipo">{{ label(tipo) }}</option>
+          </select>
+          <small class="error" *ngIf="form.controls.tipoSolicitud.touched && form.controls.tipoSolicitud.invalid">El tipo es obligatorio.</small>
+        </div>
+
+        <div class="form-row">
+          <label>Canal de origen</label>
+          <select formControlName="canalOrigen">
+            <option *ngFor="let canal of canales" [value]="canal">{{ label(canal) }}</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label>Impacto académico</label>
+          <select formControlName="impactoAcademico">
+            <option value="">Sin especificar</option>
+            <option *ngFor="let impacto of impactos" [value]="impacto">{{ label(impacto) }}</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label>Fecha límite</label>
+          <input type="date" formControlName="fechaLimite">
+          <small class="helper">Opcional. Ayuda al motor de priorización.</small>
+        </div>
+
+        <div class="form-row full">
+          <label>Descripción</label>
+          <textarea formControlName="descripcion" placeholder="Describe claramente la situación académica, fechas, asignaturas o contexto relevante."></textarea>
+          <small class="error" *ngIf="form.controls.descripcion.touched && form.controls.descripcion.invalid">La descripción debe tener entre 10 y 2000 caracteres.</small>
+        </div>
+
+        <div class="alert alert-info full" *ngIf="suggestion">
+          <strong>Sugerencia asistida:</strong>
+          tipo {{ label(suggestion.tipoSolicitudSugerido) }}, prioridad {{ label(suggestion.prioridadSugerida) }}
+          <span *ngIf="suggestion.confianza">, confianza {{ suggestion.confianza | percent:'1.0-0' }}</span>.
+          <br>
+          <span>Razones: {{ suggestion.razones.join(' · ') }}</span>
+          <div class="actions" style="margin-top: 10px;">
+            <button class="btn btn-secondary" type="button" (click)="applySuggestion()">Confirmar tipo sugerido</button>
+          </div>
+        </div>
+
+        <div class="actions full" style="justify-content: flex-end;">
+          <a class="btn btn-secondary" routerLink="/solicitudes">Cancelar</a>
+          <button class="btn btn-primary" type="submit" [disabled]="loading">{{ loading ? 'Registrando...' : 'Registrar solicitud' }}</button>
+        </div>
+      </form>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,109 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Solicitudes académicas</h1>
+      <p class="page-subtitle">Consulta paginada con filtros por estado, tipo, prioridad, responsable e identificación.</p>
+    </div>
+    <a class="btn btn-primary" routerLink="/solicitudes/nueva" *ngIf="auth.hasAnyRole(['ESTUDIANTE','ADMINISTRATIVO','COORDINADOR'])">Nueva solicitud</a>
+  </div>
+
+  <section class="card">
+    <div class="card-header">
+      <h2 class="card-title">Filtros</h2>
+      <div class="actions">
+        <button class="btn btn-secondary" type="button" (click)="clear()">Limpiar</button>
+        <button class="btn btn-primary" type="button" (click)="search(0)">Buscar</button>
+      </div>
+    </div>
+    <div class="card-body">
+      <form class="form-grid" [formGroup]="filters">
+        <div class="form-row">
+          <label>Estado</label>
+          <select formControlName="estado">
+            <option value="">Todos</option>
+            <option *ngFor="let estado of estados" [value]="estado">{{ label(estado) }}</option>
+          </select>
+        </div>
+        <ng-container *ngIf="canUseAdvancedFilters()">
+          <div class="form-row">
+            <label>Tipo</label>
+            <select formControlName="tipoSolicitud">
+              <option value="">Todos</option>
+              <option *ngFor="let tipo of tipos" [value]="tipo">{{ label(tipo) }}</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Prioridad</label>
+            <select formControlName="prioridad">
+              <option value="">Todas</option>
+              <option *ngFor="let prioridad of prioridades" [value]="prioridad">{{ label(prioridad) }}</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Responsable</label>
+            <select formControlName="responsableId">
+              <option value="">Todos</option>
+              <option *ngFor="let responsable of responsables" [value]="responsable.id">{{ responsable.nombreCompleto }}</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Texto en descripción</label>
+            <input formControlName="descripcion" placeholder="Buscar por descripción">
+          </div>
+          <div class="form-row">
+            <label>Identificación solicitante</label>
+            <input formControlName="identificacionSolicitante" placeholder="Cédula o código">
+          </div>
+        </ng-container>
+      </form>
+    </div>
+  </section>
+
+  <app-loading-spinner *ngIf="loading" />
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+  <section class="card" *ngIf="!loading && !error">
+    <div class="card-header">
+      <h2 class="card-title">Resultados</h2>
+      <span class="helper">{{ page.totalElements }} solicitudes encontradas</span>
+    </div>
+    <div class="card-body">
+      <div class="empty-state" *ngIf="page.content.length === 0">No se encontraron solicitudes con los filtros seleccionados.</div>
+      <div class="table-wrap" *ngIf="page.content.length > 0">
+        <table>
+          <thead>
+            <tr>
+              <th>Solicitud</th>
+              <th>Estado</th>
+              <th>Prioridad</th>
+              <th>Responsable</th>
+              <th>Canal</th>
+              <th>Fecha</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let solicitud of page.content">
+              <td>
+                <strong>{{ label(solicitud.tipoSolicitud) }}</strong><br>
+                <span class="helper truncate">{{ solicitud.descripcion }}</span><br>
+                <small class="helper">Solicitante: {{ solicitud.identificacionSolicitante }}</small>
+              </td>
+              <td><app-status-badge [estado]="solicitud.estado" /></td>
+              <td><app-priority-badge [prioridad]="solicitud.prioridad" /></td>
+              <td>{{ solicitud.responsable?.nombreCompleto || 'Sin asignar' }}</td>
+              <td>{{ label(solicitud.canalOrigen) }}</td>
+              <td>{{ formatDateTime(solicitud.fechaHoraRegistro) }}</td>
+              <td><a class="btn btn-secondary" [routerLink]="['/solicitudes', solicitud.id]">Detalle</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="actions" style="margin-top: 16px; justify-content: flex-end;" *ngIf="page.totalPages > 1">
+        <button class="btn btn-secondary" type="button" [disabled]="page.first" (click)="search(page.number - 1)">Anterior</button>
+        <span class="helper">Página {{ page.number + 1 }} de {{ page.totalPages }}</span>
+        <button class="btn btn-secondary" type="button" [disabled]="page.last" (click)="search(page.number + 1)">Siguiente</button>
+      </div>
+    </div>
+  </section>
+</div>

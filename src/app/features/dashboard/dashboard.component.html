@@ -1,0 +1,87 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Dashboard</h1>
+      <p class="page-subtitle">Vista general del ciclo de vida, prioridades y trazabilidad de solicitudes académicas.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-secondary" routerLink="/solicitudes">Ver solicitudes</a>
+      <a class="btn btn-primary" routerLink="/solicitudes/nueva" *ngIf="auth.hasAnyRole(['ESTUDIANTE','ADMINISTRATIVO','COORDINADOR'])">Nueva solicitud</a>
+    </div>
+  </div>
+
+  <app-loading-spinner *ngIf="loading" />
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+  <ng-container *ngIf="!loading && !error">
+    <div class="grid grid-4">
+      <div class="card metric-card">
+        <div class="metric-label">Registradas</div>
+        <div class="metric-value">{{ countByEstado('REGISTRADA') }}</div>
+        <div class="metric-note">Pendientes por clasificar</div>
+      </div>
+      <div class="card metric-card">
+        <div class="metric-label">En atención</div>
+        <div class="metric-value">{{ countByEstado('EN_ATENCION') }}</div>
+        <div class="metric-note">Casos en proceso</div>
+      </div>
+      <div class="card metric-card">
+        <div class="metric-label">Cerradas</div>
+        <div class="metric-value">{{ countByEstado('CERRADA') }}</div>
+        <div class="metric-note">Finalizadas formalmente</div>
+      </div>
+      <div class="card metric-card">
+        <div class="metric-label">Alta o crítica</div>
+        <div class="metric-value">{{ countCritical() }}</div>
+        <div class="metric-note">Requieren atención prioritaria</div>
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Últimas solicitudes</h2>
+        </div>
+        <div class="card-body">
+          <div class="empty-state" *ngIf="latest().length === 0">No hay solicitudes registradas.</div>
+          <div class="table-wrap" *ngIf="latest().length > 0">
+            <table>
+              <thead><tr><th>Tipo</th><th>Estado</th><th>Prioridad</th><th></th></tr></thead>
+              <tbody>
+                <tr *ngFor="let solicitud of latest()">
+                  <td>
+                    <strong>{{ label(solicitud.tipoSolicitud) }}</strong><br>
+                    <small class="helper">{{ formatDateTime(solicitud.fechaHoraRegistro) }}</small>
+                  </td>
+                  <td><app-status-badge [estado]="solicitud.estado" /></td>
+                  <td><app-priority-badge [prioridad]="solicitud.prioridad" /></td>
+                  <td><a class="btn-link" [routerLink]="['/solicitudes', solicitud.id]">Abrir</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-header">
+          <h2 class="card-title">Pendientes de gestión</h2>
+        </div>
+        <div class="card-body">
+          <div class="empty-state" *ngIf="pending().length === 0">No hay pendientes por gestionar.</div>
+          <div class="timeline" *ngIf="pending().length > 0">
+            <article class="timeline-item" *ngFor="let solicitud of pending()">
+              <div class="timeline-top">
+                <span>{{ formatDateTime(solicitud.fechaHoraRegistro) }}</span>
+                <app-status-badge [estado]="solicitud.estado" />
+              </div>
+              <div class="timeline-title">{{ label(solicitud.tipoSolicitud) }}</div>
+              <p class="helper truncate">{{ solicitud.descripcion }}</p>
+              <a class="btn-link" [routerLink]="['/solicitudes', solicitud.id]">Gestionar</a>
+            </article>
+          </div>
+        </div>
+      </section>
+    </div>
+  </ng-container>
+</div>

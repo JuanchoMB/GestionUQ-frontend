@@ -1,0 +1,30 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Responsables activos</h1>
+      <p class="page-subtitle">Usuarios elegibles para asignación de solicitudes según el backend.</p>
+    </div>
+  </div>
+
+  <app-loading-spinner *ngIf="loading" />
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+
+  <section class="card" *ngIf="!loading && !error">
+    <div class="card-body">
+      <div class="empty-state" *ngIf="responsables.length === 0">No hay responsables activos disponibles.</div>
+      <div class="table-wrap" *ngIf="responsables.length > 0">
+        <table>
+          <thead><tr><th>Nombre</th><th>Usuario</th><th>Rol</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let responsable of responsables">
+              <td><strong>{{ responsable.nombreCompleto }}</strong></td>
+              <td>{{ responsable.username }}</td>
+              <td>{{ label(responsable.rol) }}</td>
+              <td><span class="badge badge-green" *ngIf="responsable.activo">Activo</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</div>

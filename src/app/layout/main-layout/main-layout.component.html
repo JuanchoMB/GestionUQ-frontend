@@ -1,0 +1,43 @@
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">UQ</div>
+      <div>
+        <strong>Triage Académico</strong>
+        <span>Gestión de solicitudes</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a *ngFor="let item of visibleItems()" [routerLink]="item.route" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: item.route === '/dashboard' }">
+        <span>{{ item.icon }}</span>
+        {{ item.label }}
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="role-pill" *ngIf="auth.currentUser as user">{{ user.roles.join(', ') }}</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div>
+        <strong>Universidad del Quindío</strong>
+        <span>Sistema de trazabilidad académica</span>
+      </div>
+      <div class="user-box" *ngIf="auth.currentUser as user">
+        <div class="avatar">{{ userInitials() }}</div>
+        <div class="user-meta">
+          <strong>{{ user.nombreCompleto || user.username }}</strong>
+          <span>{{ user.username }}</span>
+        </div>
+        <button class="btn btn-secondary" type="button" (click)="logout()">Salir</button>
+      </div>
+    </header>
+
+    <section class="content">
+      <router-outlet />
+    </section>
+  </main>
+</div>

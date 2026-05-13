@@ -1,0 +1,170 @@
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Detalle de solicitud</h1>
+      <p class="page-subtitle">Gestión del ciclo de vida, acciones permitidas e historial auditable.</p>
+    </div>
+    <a class="btn btn-secondary" routerLink="/solicitudes">Volver</a>
+  </div>
+
+  <app-loading-spinner *ngIf="loading" />
+  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="alert alert-success" *ngIf="success">{{ success }}</div>
+
+  <ng-container *ngIf="!loading && solicitud as s">
+    <div class="alert alert-warning" *ngIf="isClosed()">
+      Esta solicitud está cerrada. Según la regla de negocio, ya no puede ser modificada.
+    </div>
+
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title">Información general</h2>
+        <div class="actions">
+          <app-status-badge [estado]="s.estado" />
+          <app-priority-badge [prioridad]="s.prioridad" />
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="kv">
+          <div class="k">ID</div><div class="v">{{ s.id }}</div>
+          <div class="k">Tipo</div><div class="v">{{ label(s.tipoSolicitud) }}</div>
+          <div class="k">Canal</div><div class="v">{{ label(s.canalOrigen) }}</div>
+          <div class="k">Impacto académico</div><div class="v">{{ label(s.impactoAcademico) }}</div>
+          <div class="k">Fecha límite</div><div class="v">{{ formatDate(s.fechaLimite) }}</div>
+          <div class="k">Fecha registro</div><div class="v">{{ formatDateTime(s.fechaHoraRegistro) }}</div>
+          <div class="k">Solicitante</div><div class="v">{{ s.identificacionSolicitante }}</div>
+          <div class="k">Responsable</div><div class="v">{{ s.responsable?.nombreCompleto || 'Sin asignar' }}</div>
+          <div class="k">Justificación prioridad</div><div class="v">{{ s.justificacionPrioridad || 'Sin justificación registrada' }}</div>
+          <div class="k">Descripción</div><div class="v">{{ s.descripcion }}</div>
+          <ng-container *ngIf="s.fechaCierre">
+            <div class="k">Fecha cierre</div><div class="v">{{ formatDateTime(s.fechaCierre) }}</div>
+            <div class="k">Observación cierre</div><div class="v">{{ s.observacionCierre }}</div>
+          </ng-container>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2 class="card-title">Resumen asistido</h2>
+        <button class="btn btn-ghost" type="button" (click)="generarResumen()" [disabled]="resumenLoading">
+          {{ resumenLoading ? 'Generando...' : 'Generar resumen' }}
+        </button>
+      </div>
+      <div class="card-body">
+        <p class="helper" *ngIf="!resumen">El resumen es opcional y no bloquea la operación normal del sistema.</p>
+        <div class="alert alert-info" *ngIf="resumen">{{ resumen }}</div>
+      </div>
+    </section>
+
+    <div class="grid grid-2" *ngIf="canManage()">
+      <section class="card" *ngIf="canClassify()">
+        <div class="card-header"><h2 class="card-title">Clasificar y priorizar</h2></div>
+        <div class="card-body">
+          <form class="grid" [formGroup]="clasificarForm">
+            <div class="form-row">
+              <label>Tipo</label>
+              <select formControlName="tipoSolicitud">
+                <option *ngFor="let tipo of tipos" [value]="tipo">{{ label(tipo) }}</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Prioridad</label>
+              <select formControlName="prioridad">
+                <option value="">Automática por reglas</option>
+                <option *ngFor="let prioridad of prioridades" [value]="prioridad">{{ label(prioridad) }}</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label>Justificación</label>
+              <textarea formControlName="justificacionPrioridad" placeholder="Opcional. Si se deja vacía, el backend aplica reglas."></textarea>
+            </div>
+            <div class="alert alert-info" *ngIf="prioridadSugerida">
+              Sugerencia: {{ label(prioridadSugerida.prioridadSugerida) }}. Razones: {{ prioridadSugerida.razones.join(' · ') }}
+            </div>
+            <div class="actions">
+              <button class="btn btn-secondary" type="button" (click)="suggestPriority()" [disabled]="actionLoading">Sugerir prioridad</button>
+              <button class="btn btn-primary" type="button" (click)="clasificar()" [disabled]="actionLoading">Confirmar clasificación</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="card" *ngIf="canAssign()">
+        <div class="card-header"><h2 class="card-title">Asignar responsable</h2></div>
+        <div class="card-body">
+          <form class="grid" [formGroup]="asignarForm">
+            <div class="form-row">
+              <label>Responsable activo</label>
+              <select formControlName="responsableId">
+                <option value="">Selecciona un responsable</option>
+                <option *ngFor="let r of responsables" [value]="r.id">{{ r.nombreCompleto }} · {{ label(r.rol) }}</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" type="button" (click)="asignar()" [disabled]="actionLoading || asignarForm.invalid">Asignar</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="card" *ngIf="canStartAttention()">
+        <div class="card-header"><h2 class="card-title">Iniciar atención</h2></div>
+        <div class="card-body">
+          <form class="grid" [formGroup]="iniciarForm">
+            <div class="form-row">
+              <label>Observación inicial</label>
+              <textarea formControlName="observacion" placeholder="Opcional"></textarea>
+            </div>
+            <button class="btn btn-primary" type="button" (click)="iniciarAtencion()" [disabled]="actionLoading">Iniciar atención</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="card" *ngIf="canMarkAttended()">
+        <div class="card-header"><h2 class="card-title">Marcar como atendida</h2></div>
+        <div class="card-body">
+          <form class="grid" [formGroup]="atendidaForm">
+            <div class="form-row">
+              <label>Observación de atención</label>
+              <textarea formControlName="observacion" placeholder="Describe la respuesta o gestión realizada."></textarea>
+              <small class="error" *ngIf="atendidaForm.controls.observacion.touched && atendidaForm.controls.observacion.invalid">La observación es obligatoria.</small>
+            </div>
+            <button class="btn btn-primary" type="button" (click)="marcarAtendida()" [disabled]="actionLoading">Marcar atendida</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="card" *ngIf="canClose()">
+        <div class="card-header"><h2 class="card-title">Cerrar solicitud</h2></div>
+        <div class="card-body">
+          <form class="grid" [formGroup]="cerrarForm">
+            <div class="alert alert-warning">Solo se puede cerrar si está atendida. Al cerrar, la solicitud queda inmutable.</div>
+            <div class="form-row">
+              <label>Observación de cierre</label>
+              <textarea formControlName="observacionCierre" placeholder="Formaliza el cierre del trámite."></textarea>
+              <small class="error" *ngIf="cerrarForm.controls.observacionCierre.touched && cerrarForm.controls.observacionCierre.invalid">La observación debe tener entre 5 y 1000 caracteres.</small>
+            </div>
+            <button class="btn btn-danger" type="button" (click)="cerrar()" [disabled]="actionLoading">Cerrar solicitud</button>
+          </form>
+        </div>
+      </section>
+    </div>
+
+    <section class="card">
+      <div class="card-header"><h2 class="card-title">Historial auditable</h2></div>
+      <div class="card-body">
+        <div class="empty-state" *ngIf="historial.length === 0">No hay movimientos registrados en el historial.</div>
+        <div class="timeline" *ngIf="historial.length > 0">
+          <article class="timeline-item" *ngFor="let item of historial">
+            <div class="timeline-top">
+              <span>{{ formatDateTime(item.fechaHora) }}</span>
+              <span>{{ item.usuarioResponsable }}</span>
+            </div>
+            <div class="timeline-title">{{ label(item.accion) }}</div>
+            <p class="helper" *ngIf="item.detalle">{{ item.detalle }}</p>
+            <p *ngIf="item.observaciones">{{ item.observaciones }}</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </ng-container>
+</div>
