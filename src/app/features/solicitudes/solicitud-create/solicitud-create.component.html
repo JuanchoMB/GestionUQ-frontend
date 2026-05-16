@@ -12,8 +12,17 @@
   <section class="card">
     <div class="card-header">
       <h2 class="card-title">Datos de la solicitud</h2>
-      <button class="btn btn-ghost" type="button" (click)="suggest()" [disabled]="suggesting" *ngIf="canSuggest()">
-        {{ suggesting ? 'Generando sugerencia...' : 'Sugerir con IA' }}
+      <button
+        class="btn-ai"
+        type="button"
+        (click)="suggest()"
+        [disabled]="suggesting"
+      >
+        <span class="btn-ai-loading" *ngIf="suggesting"></span>
+        <span class="btn-ai-icon" *ngIf="!suggesting">✦</span>
+        <span class="btn-ai-text">
+    {{ suggesting ? 'Analizando...' : 'Sugerir con IA' }}
+  </span>
       </button>
     </div>
     <div class="card-body">

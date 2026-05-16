@@ -4,7 +4,7 @@
       <h1 class="page-title">Solicitudes académicas</h1>
       <p class="page-subtitle">Consulta paginada con filtros por estado, tipo, prioridad, responsable e identificación.</p>
     </div>
-    <a class="btn btn-primary" routerLink="/solicitudes/nueva" *ngIf="auth.hasAnyRole(['ESTUDIANTE','ADMINISTRATIVO','COORDINADOR'])">Nueva solicitud</a>
+    <a class="btn btn-primary" routerLink="/solicitudes/nueva" *ngIf="auth.hasAnyRole(['ESTUDIANTE','ADMINISTRATIVO','COORDINADOR'])"> + Nueva solicitud </a>
   </div>
 
   <section class="card">

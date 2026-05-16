@@ -1,10 +1,10 @@
-import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';import { AfterViewInit, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { extractErrorMessage } from '../../../core/utils/labels';
 import { AlertService } from '../../../core/services/alert.service';
+import { AnimationService } from '../../../core/services/animation.service';
 
 @Component({
   selector: 'app-login',
@@ -13,7 +13,7 @@ import { AlertService } from '../../../core/services/alert.service';
   styleUrls: ['./login.component.css'],
   templateUrl: './login.component.html'
 })
-export class LoginComponent {
+export class LoginComponent implements AfterViewInit {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
@@ -66,5 +66,20 @@ export class LoginComponent {
         );
       }
     });
+
+  }
+  private readonly animation = inject(AnimationService);
+
+  @ViewChild('loginPage') loginPage?: ElementRef<HTMLElement>;
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      if (!this.loginPage) return;
+
+      this.animation.pageEnter(this.loginPage.nativeElement);
+
+      const cards = this.loginPage.nativeElement.querySelectorAll('.hero-card, .login-card');
+      this.animation.cardsEnter(cards);
+    }, 100);
   }
 }

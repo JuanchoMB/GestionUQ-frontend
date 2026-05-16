@@ -1,9 +1,16 @@
 <div class="shell">
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-mark">UQ</div>
-      <div>
-        <strong>Triage Académico</strong>
+      <div class="brand-logo-card">
+        <img
+          src="assets/logo2-uq.png"
+          alt="Universidad del Quindío"
+          class="brand-logo-image"
+        />
+      </div>
+
+      <div class="brand-text">
+        <strong>Universidad del Quindío</strong>
         <span>Gestión de solicitudes</span>
       </div>
     </div>
@@ -23,7 +30,7 @@
   <main class="main">
     <header class="topbar">
       <div>
-        <strong>Universidad del Quindío</strong>
+        <strong>Trage Academico</strong>
         <span>Sistema de trazabilidad académica</span>
       </div>
       <div class="user-box" *ngIf="auth.currentUser as user">
@@ -32,7 +39,7 @@
           <strong>{{ user.nombreCompleto || user.username }}</strong>
           <span>{{ user.username }}</span>
         </div>
-        <button class="btn btn-secondary" type="button" (click)="logout()">Salir</button>
+        <button class="btn btn-secondary" type="button" (click)="logout()">Salir ➜ </button>
       </div>
     </header>
 

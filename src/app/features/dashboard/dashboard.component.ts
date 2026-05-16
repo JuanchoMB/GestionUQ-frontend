@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { SolicitudService } from '../../core/services/solicitud.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -9,6 +9,7 @@ import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-sp
 import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.component';
 import { PriorityBadgeComponent } from '../../shared/priority-badge/priority-badge.component';
 import { extractErrorMessage, formatDateTime, labelEnum } from '../../core/utils/labels';
+import { AnimationService } from '../../core/services/animation.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,7 +17,7 @@ import { extractErrorMessage, formatDateTime, labelEnum } from '../../core/utils
   imports: [CommonModule, RouterLink, LoadingSpinnerComponent, StatusBadgeComponent, PriorityBadgeComponent],
   templateUrl: './dashboard.component.html'
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, AfterViewInit {
   private readonly solicitudService = inject(SolicitudService);
   readonly auth = inject(AuthService);
 
@@ -63,5 +64,22 @@ export class DashboardComponent implements OnInit {
 
   pending(): Solicitud[] {
     return this.solicitudes.filter(s => s.estado !== 'CERRADA').slice(0, 6);
+  }
+  private readonly animation = inject(AnimationService);
+
+  @ViewChild('dashboardPage') dashboardPage?: ElementRef<HTMLElement>;
+
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      if (!this.dashboardPage) return;
+
+      this.animation.pageEnter(this.dashboardPage.nativeElement);
+
+      const cards = this.dashboardPage.nativeElement.querySelectorAll('.card');
+      this.animation.cardsEnter(cards);
+
+      const rows = this.dashboardPage.nativeElement.querySelectorAll('tbody tr, .timeline-item');
+      this.animation.rowsEnter(rows);
+    }, 120);
   }
 }

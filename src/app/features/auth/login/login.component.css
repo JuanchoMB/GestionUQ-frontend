@@ -1,18 +1,266 @@
-.login-page { min-height: 100vh; display: grid; grid-template-columns: 1.1fr .9fr; }
-.login-hero {
-  background: radial-gradient(circle at top left, rgba(255,255,255,.22), transparent 34%), linear-gradient(135deg, #17415d, #22577a);
-  color: white; display: grid; place-items: center; padding: 42px;
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  background: #ffffff;
 }
-.hero-card { max-width: 620px; }
-.logo { width: 74px; height: 74px; border-radius: 24px; background: white; color: #17415d; display: grid; place-items: center; font-weight: 950; font-size: 24px; margin-bottom: 28px; }
-h1 { font-size: 48px; line-height: 1.03; letter-spacing: -0.05em; margin: 0 0 18px; }
-p { font-size: 18px; line-height: 1.65; color: rgba(255,255,255,.82); }
-.demo-users { margin-top: 30px; padding: 18px; border-radius: 18px; background: rgba(255,255,255,.12); display: grid; gap: 8px; max-width: 340px; }
-.demo-users span { color: rgba(255,255,255,.86); }
-.login-panel { display: grid; place-items: center; padding: 32px; }
-.login-card { width: min(440px, 100%); }
-h2 { margin: 0 0 8px; font-size: 30px; letter-spacing: -0.03em; }
-.muted { margin: 0 0 22px; color: #667085; font-size: 15px; }
-.form-row { margin-top: 16px; }
-.full-btn { width: 100%; margin-top: 22px; }
-@media (max-width: 900px) { .login-page { grid-template-columns: 1fr; } h1 { font-size: 34px; } }
+
+/* Panel izquierdo */
+.login-hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 4rem 5rem;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 15% 15%, rgba(255, 255, 255, 0.10), transparent 28%),
+    radial-gradient(circle at 65% 45%, rgba(28, 102, 46, 0.32), transparent 35%),
+    linear-gradient(135deg, #234c1f 0%, #1b451a 48%, #113013 100%);
+}
+
+.login-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05), transparent 40%),
+    radial-gradient(circle at 30% 60%, rgba(0, 0, 0, 0.08), transparent 38%);
+  pointer-events: none;
+}
+
+.login-hero::after {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  left: -100px;
+  bottom: -120px;
+  filter: blur(6px);
+}
+
+.hero-card {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 2.2rem;
+  max-width: 920px;
+}
+
+.hero-logo-card {
+  width: 235px;
+  height: 265px;
+  border-radius: 38px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.35rem;
+  box-shadow:
+    0 32px 80px rgba(8, 39, 16, 0.34),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45);
+  flex: 0 0 auto;
+}
+
+.hero-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.hero-text {
+  max-width: 590px;
+}
+
+.hero-text h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(2.1rem, 4vw, 3.15rem);
+  line-height: 1.08;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+}
+
+.hero-text p {
+  margin: 1.4rem 0 0;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1.08rem;
+  line-height: 1.75;
+  max-width: 610px;
+}
+
+/* Panel derecho */
+.login-panel {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background:
+    radial-gradient(circle at top right, rgba(36, 93, 34, 0.10), transparent 30%),
+    linear-gradient(135deg, #ffffff 0%, #f7faf6 100%);
+}
+
+/* Tarjeta de login */
+.login-card {
+  width: min(100%, 430px);
+  border-radius: 28px;
+  border: 1px solid rgba(36, 93, 34, 0.18);
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow:
+    0 28px 70px rgba(22, 63, 25, 0.13),
+    0 0 0 1px rgba(255, 255, 255, 0.65);
+}
+
+.login-card .card-body {
+  padding: 2.2rem;
+}
+
+.login-card h2 {
+  margin: 0;
+  color: #163f19;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  text-align: center;
+}
+
+.login-card .muted {
+  margin: 0.55rem 0 1.7rem;
+  color: #4f6f52;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* Formulario */
+.form-row {
+  margin-bottom: 1.15rem;
+}
+
+.form-row label {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: #163f19;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.form-row input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid rgba(36, 93, 34, 0.22);
+  border-radius: 14px;
+  padding: 0.75rem 0.9rem;
+  color: #102a13;
+  font-size: 0.95rem;
+  outline: none;
+  background: #f1faee;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+.form-row input:-webkit-autofill,
+.form-row input:-webkit-autofill:hover,
+.form-row input:-webkit-autofill:focus,
+.form-row input:-webkit-autofill:active {
+  -webkit-text-fill-color: #102a13;
+  box-shadow: 0 0 0 1000px #f1faee inset;
+  caret-color: #102a13;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+.form-row input:focus {
+  border-color: #2f7d32;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(47, 125, 50, 0.14);
+}
+
+.form-row input::placeholder {
+  color: #8ca38e;
+}
+
+.error {
+  display: block;
+  margin-top: 0.35rem;
+  color: #dc2626;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.alert {
+  margin-bottom: 1rem;
+}
+
+/* El color principal del botón se toma desde styles.css global */
+.full-btn {
+  width: 100%;
+  margin-top: 0.6rem;
+  min-height: 48px;
+  border-radius: 14px;
+}
+
+/* Responsive */
+@media (max-width: 1050px) {
+  .login-page {
+    grid-template-columns: 1fr;
+  }
+
+  .login-hero {
+    min-height: auto;
+    padding: 3rem 2rem;
+  }
+
+  .hero-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-logo-card {
+    width: 180px;
+    height: 210px;
+    border-radius: 30px;
+  }
+
+  .login-panel {
+    min-height: auto;
+    padding: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .login-hero {
+    padding: 2.2rem 1.3rem;
+  }
+
+  .hero-card {
+    gap: 1.5rem;
+  }
+
+  .hero-logo-card {
+    width: 150px;
+    height: 175px;
+    border-radius: 26px;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .hero-text p {
+    font-size: 0.98rem;
+  }
+
+  .login-panel {
+    padding: 1.25rem;
+  }
+
+  .login-card .card-body {
+    padding: 1.4rem;
+  }
+}
