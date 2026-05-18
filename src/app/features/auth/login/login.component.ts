@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';import { AfterViewInit, Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { extractErrorMessage } from '../../../core/utils/labels';
 import { AlertService } from '../../../core/services/alert.service';
@@ -9,7 +9,7 @@ import { AnimationService } from '../../../core/services/animation.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   styleUrls: ['./login.component.css'],
   templateUrl: './login.component.html'
 })

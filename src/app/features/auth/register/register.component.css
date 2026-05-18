@@ -1,0 +1,35 @@
+@import '../login/login.component.css';
+
+.register-card {
+  width: min(100%, 560px);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+.auth-link {
+  margin: 1.25rem 0 0;
+  text-align: center;
+  color: #4f6f52;
+  font-size: 0.92rem;
+}
+
+.auth-link a {
+  color: #2f7d32;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

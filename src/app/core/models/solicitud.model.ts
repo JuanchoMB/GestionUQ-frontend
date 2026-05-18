@@ -80,6 +80,15 @@ export interface UsuarioSimple {
   rol: RolUsuario;
   activo: boolean;
 }
+export interface CrearResponsableRequest {
+  username: string;
+  nombres: string;
+  apellidos: string;
+  email: string;
+  identificacion: string;
+  password: string;
+  rol: 'ADMINISTRATIVO' | 'COORDINADOR' | 'CONSULTOR';
+}
 
 export interface SugerirPrioridadRequest {
   tipoSolicitud: TipoSolicitud;

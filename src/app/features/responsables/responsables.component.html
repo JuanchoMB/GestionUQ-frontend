@@ -1,30 +1,254 @@
 <div class="page">
   <div class="page-header">
     <div>
-      <h1 class="page-title">Responsables activos</h1>
-      <p class="page-subtitle">Usuarios elegibles para asignación de solicitudes según el backend.</p>
+      <h1 class="page-title">Responsables</h1>
+      <p class="page-subtitle">
+        Gestión de usuarios responsables del sistema académico.
+      </p>
     </div>
+
+    <button
+      class="btn btn-primary"
+      type="button"
+      *ngIf="canCreateResponsable()"
+      (click)="toggleCreateForm()"
+    >
+      {{ showCreateForm ? 'Cerrar formulario' : '+ Registrar responsable' }}
+    </button>
   </div>
 
-  <app-loading-spinner *ngIf="loading" />
-  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <section class="card create-responsable-card" *ngIf="showCreateForm">
+    <div class="card-header">
+      <h2 class="card-title">Registrar responsable</h2>
+    </div>
 
-  <section class="card" *ngIf="!loading && !error">
     <div class="card-body">
-      <div class="empty-state" *ngIf="responsables.length === 0">No hay responsables activos disponibles.</div>
-      <div class="table-wrap" *ngIf="responsables.length > 0">
-        <table>
-          <thead><tr><th>Nombre</th><th>Usuario</th><th>Rol</th><th>Estado</th></tr></thead>
-          <tbody>
-            <tr *ngFor="let responsable of responsables">
+      <div class="alert alert-danger" *ngIf="createError">
+        {{ createError }}
+      </div>
+
+      <form class="form-grid" [formGroup]="form" (ngSubmit)="crearResponsable()">
+        <div class="form-row">
+          <label for="nombres">Nombres</label>
+          <input id="nombres" formControlName="nombres" placeholder="Nombre del responsable" />
+          <small class="error" *ngIf="form.controls.nombres.touched && form.controls.nombres.invalid">
+            Los nombres son obligatorios.
+          </small>
+        </div>
+
+        <div class="form-row">
+          <label for="apellidos">Apellidos</label>
+          <input id="apellidos" formControlName="apellidos" placeholder="Apellidos del responsable" />
+          <small class="error" *ngIf="form.controls.apellidos.touched && form.controls.apellidos.invalid">
+            Los apellidos son obligatorios.
+          </small>
+        </div>
+
+        <div class="form-row">
+          <label for="identificacion">Identificación</label>
+          <input id="identificacion" formControlName="identificacion" placeholder="Número de identificación" />
+          <small class="error" *ngIf="form.controls.identificacion.touched && form.controls.identificacion.invalid">
+            La identificación es obligatoria.
+          </small>
+        </div>
+
+        <div class="form-row">
+          <label for="email">Correo electrónico</label>
+          <input id="email" type="email" formControlName="email" placeholder="responsable@uniquindio.edu.co" />
+          <small class="error" *ngIf="form.controls.email.touched && form.controls.email.invalid">
+            Ingresa un correo válido.
+          </small>
+        </div>
+
+        <div class="form-row">
+          <label for="username">Usuario</label>
+          <input id="username" formControlName="username" placeholder="usuario" />
+          <small class="error" *ngIf="form.controls.username.touched && form.controls.username.invalid">
+            El usuario debe tener mínimo 3 caracteres.
+          </small>
+        </div>
+
+        <div class="form-row">
+          <label for="password">Contraseña temporal</label>
+          <input id="password" type="password" formControlName="password" placeholder="Mínimo 6 caracteres" />
+          <small class="error" *ngIf="form.controls.password.touched && form.controls.password.invalid">
+            La contraseña debe tener mínimo 6 caracteres.
+          </small>
+        </div>
+
+        <div class="form-row full">
+          <label for="rol">Rol</label>
+          <div class="select-field">
+            <select id="rol" formControlName="rol">
+              <option *ngFor="let rol of rolesResponsable" [value]="rol">
+                {{ label(rol) }}
+              </option>
+            </select>
+            <span class="select-arrow">⌄</span>
+          </div>
+        </div>
+
+        <div class="actions full" style="justify-content: flex-end;">
+          <button class="btn btn-secondary" type="button" (click)="toggleCreateForm()" [disabled]="creating">
+            Cancelar
+          </button>
+
+          <button class="btn btn-primary" type="submit" [disabled]="creating">
+            {{ creating ? 'Creando...' : 'Crear responsable' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <app-loading-spinner *ngIf="loading" />
+
+  <div class="alert alert-danger" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <ng-container *ngIf="!loading && !error">
+
+    <!-- RESPONSABLES -->
+    <section class="card section-card">
+      <div class="card-header">
+        <h2 class="card-title">Responsables</h2>
+      </div>
+
+      <div class="card-body">
+        <div class="empty-state" *ngIf="responsablesActivos.length === 0">
+          No hay responsables activos.
+        </div>
+
+        <div class="table-wrap" *ngIf="responsablesActivos.length > 0">
+          <table>
+            <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th *ngIf="canCreateResponsable()">Acciones</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr *ngFor="let responsable of responsablesActivos">
               <td><strong>{{ responsable.nombreCompleto }}</strong></td>
               <td>{{ responsable.username }}</td>
               <td>{{ label(responsable.rol) }}</td>
-              <td><span class="badge badge-green" *ngIf="responsable.activo">Activo</span></td>
+              <td>
+                <span class="badge badge-green">Activo</span>
+              </td>
+              <td *ngIf="canCreateResponsable()">
+                <button
+                  class="btn-status btn-status-danger"
+                  type="button"
+                  (click)="desactivarResponsable(responsable)"
+                >
+                  Desactivar
+                </button>
+              </td>
             </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <!-- CONSULTORES -->
+    <section class="card section-card" *ngIf="canCreateResponsable()">
+      <div class="card-header">
+        <h2 class="card-title">Consultores</h2>
+      </div>
+
+      <div class="card-body">
+        <div class="empty-state" *ngIf="consultoresActivos.length === 0">
+          No hay consultores activos.
+        </div>
+
+        <div class="table-wrap" *ngIf="consultoresActivos.length > 0">
+          <table>
+            <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr *ngFor="let consultor of consultoresActivos">
+              <td><strong>{{ consultor.nombreCompleto }}</strong></td>
+              <td>{{ consultor.username }}</td>
+              <td>{{ label(consultor.rol) }}</td>
+              <td>
+                <span class="badge badge-green">Activo</span>
+              </td>
+              <td>
+                <button
+                  class="btn-status btn-status-danger"
+                  type="button"
+                  (click)="desactivarResponsable(consultor)"
+                >
+                  Desactivar
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- INACTIVOS -->
+    <section class="card section-card" *ngIf="canCreateResponsable()">
+      <div class="card-header">
+        <h2 class="card-title">Inactivos</h2>
+      </div>
+
+      <div class="card-body">
+        <div class="empty-state" *ngIf="responsablesInactivos.length === 0">
+          No hay usuarios inactivos.
+        </div>
+
+        <div class="table-wrap" *ngIf="responsablesInactivos.length > 0">
+          <table>
+            <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Usuario</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr *ngFor="let inactivo of responsablesInactivos" class="row-inactive">
+              <td><strong>{{ inactivo.nombreCompleto }}</strong></td>
+              <td>{{ inactivo.username }}</td>
+              <td>{{ label(inactivo.rol) }}</td>
+              <td>
+                <span class="badge badge-gray">Inactivo</span>
+              </td>
+              <td>
+                <button
+                  class="btn-status btn-status-success"
+                  type="button"
+                  (click)="activarResponsable(inactivo)"
+                >
+                  Activar
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </ng-container>
 </div>

@@ -1,0 +1,214 @@
+<div class="login-page animated-page" #registerPage>
+  <section class="login-hero">
+    <div class="hero-card">
+      <div class="hero-logo-card">
+        <img
+          src="assets/logo-uq.png"
+          alt="Universidad del Quindío"
+          class="hero-logo"
+        />
+      </div>
+
+      <div class="hero-text">
+        <h1>Registro de estudiante</h1>
+        <p>
+          Crea tu cuenta para registrar, consultar y hacer seguimiento a tus solicitudes académicas.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="login-panel">
+    <form class="card login-card register-card" [formGroup]="form" (ngSubmit)="submit()">
+      <div class="card-body">
+        <h2>Crear cuenta</h2>
+        <p class="muted">El registro es únicamente para estudiantes.</p>
+
+        <div class="alert alert-danger" *ngIf="error">
+          {{ error }}
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="nombres">Nombres</label>
+            <input
+              id="nombres"
+              formControlName="nombres"
+              autocomplete="given-name"
+              placeholder="Juan"
+            />
+
+            <small
+              class="error"
+              *ngIf="form.controls.nombres.touched && form.controls.nombres.hasError('required')"
+            >
+              Los nombres son obligatorios.
+            </small>
+          </div>
+
+          <div class="form-row">
+            <label for="apellidos">Apellidos</label>
+            <input
+              id="apellidos"
+              formControlName="apellidos"
+              autocomplete="family-name"
+              placeholder="Pérez"
+            />
+
+            <small
+              class="error"
+              *ngIf="form.controls.apellidos.touched && form.controls.apellidos.hasError('required')"
+            >
+              Los apellidos son obligatorios.
+            </small>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label for="identificacion">Identificación</label>
+          <input
+            id="identificacion"
+            formControlName="identificacion"
+            autocomplete="off"
+            placeholder="1000000000"
+          />
+
+          <small
+            class="error"
+            *ngIf="form.controls.identificacion.touched && form.controls.identificacion.hasError('required')"
+          >
+            La identificación es obligatoria.
+          </small>
+        </div>
+
+        <div class="form-row">
+          <label for="email">Correo institucional</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            placeholder="usuario@uniquindio.edu.co"
+          />
+
+          <small
+            class="error"
+            *ngIf="form.controls.email.touched && form.controls.email.hasError('required')"
+          >
+            El correo institucional es obligatorio.
+          </small>
+
+          <small
+            class="error"
+            *ngIf="form.controls.email.touched && form.controls.email.hasError('email')"
+          >
+            Ingresa un correo válido.
+          </small>
+
+          <small
+            class="error"
+            *ngIf="form.controls.email.touched && form.controls.email.hasError('pattern')"
+          >
+            El correo debe finalizar en &#64;uniquindio.edu.co.
+          </small>
+
+          <small
+            class="error"
+            *ngIf="form.controls.email.touched && form.controls.email.hasError('institutionalEmail')"
+          >
+            Debes usar un correo institucional terminado en &#64;uniquindio.edu.co.
+          </small>
+
+          <small class="helper">
+            Usa únicamente tu correo institucional de la Universidad del Quindío.
+          </small>
+        </div>
+
+        <div class="form-row">
+          <label for="username">Usuario</label>
+          <input
+            id="username"
+            formControlName="username"
+            autocomplete="username"
+            placeholder="estudiante1"
+          />
+
+          <small
+            class="error"
+            *ngIf="form.controls.username.touched && form.controls.username.hasError('required')"
+          >
+            El usuario es obligatorio.
+          </small>
+
+          <small
+            class="error"
+            *ngIf="form.controls.username.touched && form.controls.username.hasError('minlength')"
+          >
+            El usuario debe tener mínimo 3 caracteres.
+          </small>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row">
+            <label for="password">Contraseña</label>
+            <input
+              id="password"
+              type="password"
+              formControlName="password"
+              autocomplete="new-password"
+              placeholder="Mínimo 6 caracteres"
+            />
+
+            <small
+              class="error"
+              *ngIf="form.controls.password.touched && form.controls.password.hasError('required')"
+            >
+              La contraseña es obligatoria.
+            </small>
+
+            <small
+              class="error"
+              *ngIf="form.controls.password.touched && form.controls.password.hasError('minlength')"
+            >
+              La contraseña debe tener mínimo 6 caracteres.
+            </small>
+          </div>
+
+          <div class="form-row">
+            <label for="confirmPassword">Confirmar contraseña</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              formControlName="confirmPassword"
+              autocomplete="new-password"
+              placeholder="Repite la contraseña"
+            />
+
+            <small
+              class="error"
+              *ngIf="form.controls.confirmPassword.touched && form.controls.confirmPassword.hasError('required')"
+            >
+              Confirma tu contraseña.
+            </small>
+
+            <small
+              class="error"
+              *ngIf="form.controls.confirmPassword.touched && form.controls.confirmPassword.hasError('passwordMismatch')"
+            >
+              Las contraseñas deben coincidir.
+            </small>
+          </div>
+        </div>
+
+        <button class="btn btn-primary full-btn" type="submit" [disabled]="loading">
+          {{ loading ? 'Registrando...' : 'Crear cuenta de estudiante' }}
+        </button>
+
+        <p class="auth-link">
+          ¿Ya tienes cuenta?
+          <a routerLink="/login">Inicia sesión</a>
+        </p>
+      </div>
+    </form>
+  </section>
+</div>

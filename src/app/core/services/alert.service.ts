@@ -52,14 +52,17 @@ export class AlertService {
     confirmButtonText: string = 'Sí, continuar'
   ): Promise<boolean> {
     const result = await Swal.fire({
-      icon: 'question',
+      icon: 'warning',
       title,
       text,
       showCancelButton: true,
       confirmButtonText,
       cancelButtonText: 'Cancelar',
-      confirmButtonColor: '#1f5f85',
-      cancelButtonColor: '#64748b'
+      confirmButtonColor: '#b91c1c',
+      cancelButtonColor: '#6b7280',
+      reverseButtons: true,
+      background: '#ffffff',
+      color: '#102a13'
     });
 
     return result.isConfirmed;

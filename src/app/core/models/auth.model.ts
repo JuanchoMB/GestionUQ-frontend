@@ -32,3 +32,12 @@ export interface RefreshTokenResponse {
   type: string;
   expiresIn: number;
 }
+export interface RegisterRequest {
+  username: string;
+  nombres: string;
+  apellidos: string;
+  email: string;
+  identificacion: string;
+  password: string;
+}
+

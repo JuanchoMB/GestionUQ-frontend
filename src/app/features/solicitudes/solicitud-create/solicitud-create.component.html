@@ -2,81 +2,241 @@
   <div class="page-header">
     <div>
       <h1 class="page-title">Registrar solicitud</h1>
-      <p class="page-subtitle">Crea una solicitud académica estructurada. La identidad del solicitante se toma del JWT del backend.</p>
+      <p class="page-subtitle">
+        Crea una solicitud académica estructurada. La identidad del solicitante se toma del JWT del backend.
+      </p>
     </div>
-    <a class="btn btn-secondary" routerLink="/solicitudes">Volver</a>
+
+    <a class="btn btn-secondary" routerLink="/solicitudes">
+      Volver
+    </a>
   </div>
 
-  <div class="alert alert-danger" *ngIf="error">{{ error }}</div>
+  <div class="alert alert-danger" *ngIf="error">
+    {{ error }}
+  </div>
 
   <section class="card">
     <div class="card-header">
       <h2 class="card-title">Datos de la solicitud</h2>
+
       <button
         class="btn-ai"
         type="button"
         (click)="suggest()"
         [disabled]="suggesting"
+        *ngIf="canSuggest()"
       >
         <span class="btn-ai-loading" *ngIf="suggesting"></span>
         <span class="btn-ai-icon" *ngIf="!suggesting">✦</span>
         <span class="btn-ai-text">
-    {{ suggesting ? 'Analizando...' : 'Sugerir con IA' }}
-  </span>
+          {{ suggesting ? 'Analizando...' : 'Sugerir con IA' }}
+        </span>
       </button>
     </div>
+
     <div class="card-body">
       <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
         <div class="form-row">
-          <label>Tipo de solicitud</label>
-          <select formControlName="tipoSolicitud">
+          <label for="tipoSolicitud">Tipo de solicitud</label>
+          <select id="tipoSolicitud" formControlName="tipoSolicitud">
             <option value="">Selecciona un tipo</option>
-            <option *ngFor="let tipo of tipos" [value]="tipo">{{ label(tipo) }}</option>
+            <option *ngFor="let tipo of tipos" [value]="tipo">
+              {{ label(tipo) }}
+            </option>
           </select>
-          <small class="error" *ngIf="form.controls.tipoSolicitud.touched && form.controls.tipoSolicitud.invalid">El tipo es obligatorio.</small>
+
+          <small
+            class="error"
+            *ngIf="form.controls.tipoSolicitud.touched && form.controls.tipoSolicitud.invalid"
+          >
+            El tipo es obligatorio.
+          </small>
         </div>
 
         <div class="form-row">
-          <label>Canal de origen</label>
-          <select formControlName="canalOrigen">
-            <option *ngFor="let canal of canales" [value]="canal">{{ label(canal) }}</option>
+          <label for="canalOrigen">Canal de origen</label>
+          <select id="canalOrigen" formControlName="canalOrigen">
+            <option *ngFor="let canal of canales" [value]="canal">
+              {{ label(canal) }}
+            </option>
           </select>
         </div>
 
         <div class="form-row">
-          <label>Impacto académico</label>
-          <select formControlName="impactoAcademico">
+          <label for="impactoAcademico">Impacto académico</label>
+          <select id="impactoAcademico" formControlName="impactoAcademico">
             <option value="">Sin especificar</option>
-            <option *ngFor="let impacto of impactos" [value]="impacto">{{ label(impacto) }}</option>
+            <option *ngFor="let impacto of impactos" [value]="impacto">
+              {{ label(impacto) }}
+            </option>
           </select>
         </div>
 
-        <div class="form-row">
-          <label>Fecha límite</label>
-          <input type="date" formControlName="fechaLimite">
-          <small class="helper">Opcional. Ayuda al motor de priorización.</small>
+        <div class="form-row datepicker-row">
+          <label for="fechaLimite">Fecha límite</label>
+
+          <div class="custom-datepicker">
+            <button
+              id="fechaLimite"
+              type="button"
+              class="date-input date-trigger"
+              [class.active]="calendarOpen"
+              (click)="toggleCalendar()"
+            >
+              <span [class.placeholder]="!form.controls.fechaLimite.value">
+                {{ selectedDateLabel || 'Selecciona fecha' }}
+              </span>
+
+              <span class="date-icon">⌄</span>
+            </button>
+
+            <div class="calendar-popover" *ngIf="calendarOpen">
+              <div class="calendar-header">
+                <button
+                  type="button"
+                  class="calendar-nav"
+                  (click)="previousMonth()"
+                  aria-label="Mes anterior"
+                >
+                  ‹
+                </button>
+
+                <strong>
+                  {{ monthNames[currentMonth] }} {{ currentYear }}
+                </strong>
+
+                <button
+                  type="button"
+                  class="calendar-nav"
+                  (click)="nextMonth()"
+                  aria-label="Mes siguiente"
+                >
+                  ›
+                </button>
+              </div>
+
+              <div class="calendar-weekdays">
+                <span *ngFor="let day of weekDays">
+                  {{ day }}
+                </span>
+              </div>
+
+              <div class="calendar-grid">
+                <button
+                  type="button"
+                  class="calendar-day empty"
+                  *ngFor="let empty of emptyDays"
+                  disabled
+                ></button>
+
+                <button
+                  type="button"
+                  class="calendar-day"
+                  *ngFor="let day of daysInMonth"
+                  [class.selected]="isSelected(day)"
+                  [class.today]="isToday(day)"
+                  [class.disabled]="isPastDate(day)"
+                  [disabled]="isPastDate(day)"
+                  (click)="selectDate(day)"
+                >
+                  {{ day }}
+                </button>
+              </div>
+
+              <div class="calendar-footer">
+                <button
+                  type="button"
+                  class="calendar-clear"
+                  (click)="clearDate()"
+                >
+                  Borrar
+                </button>
+
+                <button
+                  type="button"
+                  class="calendar-today"
+                  (click)="selectToday()"
+                >
+                  Hoy
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <small
+            class="error"
+            *ngIf="form.controls.fechaLimite.touched && form.controls.fechaLimite.hasError('required')"
+          >
+            La fecha límite es obligatoria.
+          </small>
+
+          <small
+            class="error"
+            *ngIf="form.controls.fechaLimite.touched && form.controls.fechaLimite.hasError('pastDate')"
+          >
+            No puedes seleccionar una fecha anterior a la fecha actual.
+          </small>
+
+          <small
+            class="helper"
+            *ngIf="
+              !form.controls.fechaLimite.hasError('required') &&
+              !form.controls.fechaLimite.hasError('pastDate')
+            "
+          >
+            Ayuda al motor de priorización.
+          </small>
         </div>
 
         <div class="form-row full">
-          <label>Descripción</label>
-          <textarea formControlName="descripcion" placeholder="Describe claramente la situación académica, fechas, asignaturas o contexto relevante."></textarea>
-          <small class="error" *ngIf="form.controls.descripcion.touched && form.controls.descripcion.invalid">La descripción debe tener entre 10 y 2000 caracteres.</small>
+          <label for="descripcion">Descripción</label>
+          <textarea
+            id="descripcion"
+            formControlName="descripcion"
+            placeholder="Describe claramente la situación académica, fechas, asignaturas o contexto relevante."
+          ></textarea>
+
+          <small
+            class="error"
+            *ngIf="form.controls.descripcion.touched && form.controls.descripcion.invalid"
+          >
+            La descripción debe tener entre 10 y 2000 caracteres.
+          </small>
         </div>
 
         <div class="alert alert-info full" *ngIf="suggestion">
           <strong>Sugerencia asistida:</strong>
-          tipo {{ label(suggestion.tipoSolicitudSugerido) }}, prioridad {{ label(suggestion.prioridadSugerida) }}
-          <span *ngIf="suggestion.confianza">, confianza {{ suggestion.confianza | percent:'1.0-0' }}</span>.
-          <br>
-          <span>Razones: {{ suggestion.razones.join(' · ') }}</span>
+          tipo {{ label(suggestion.tipoSolicitudSugerido) }},
+          prioridad {{ label(suggestion.prioridadSugerida) }}
+          <span *ngIf="suggestion.confianza">
+            , confianza {{ suggestion.confianza | percent:'1.0-0' }}
+          </span>.
+          <br />
+
+          <span>
+            Razones: {{ suggestion.razones.join(' · ') }}
+          </span>
+
           <div class="actions" style="margin-top: 10px;">
-            <button class="btn btn-secondary" type="button" (click)="applySuggestion()">Confirmar tipo sugerido</button>
+            <button
+              class="btn btn-secondary"
+              type="button"
+              (click)="applySuggestion()"
+            >
+              Confirmar tipo sugerido
+            </button>
           </div>
         </div>
 
         <div class="actions full" style="justify-content: flex-end;">
-          <a class="btn btn-secondary" routerLink="/solicitudes">Cancelar</a>
-          <button class="btn btn-primary" type="submit" [disabled]="loading">{{ loading ? 'Registrando...' : 'Registrar solicitud' }}</button>
+          <a class="btn btn-secondary" routerLink="/solicitudes">
+            Cancelar
+          </a>
+
+          <button class="btn btn-primary" type="submit" [disabled]="loading">
+            {{ loading ? 'Registrando...' : 'Registrar solicitud' }}
+          </button>
         </div>
       </form>
     </div>

@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable, catchError, map, of, switchMap, tap } from
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
-import { AuthMeResponse, LoginRequest, LoginResponse } from '../models/auth.model';
+import { AuthMeResponse, LoginRequest, LoginResponse, RegisterRequest } from '../models/auth.model';
 import { RolUsuario } from '../models/enums';
 
 const TOKEN_KEY = 'triage_token';
@@ -39,6 +39,11 @@ export class AuthService {
         this.logout(false);
         throw error;
       })
+    );
+  }
+  register(request: RegisterRequest): Observable<AuthMeResponse> {
+    return this.http.post<ApiResponse<AuthMeResponse>>(`${this.baseUrl}/register`, request).pipe(
+      map(response => response.data)
     );
   }
 

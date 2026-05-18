@@ -165,6 +165,7 @@
     box-shadow 180ms ease,
     background 180ms ease;
 }
+
 .form-row input:-webkit-autofill,
 .form-row input:-webkit-autofill:hover,
 .form-row input:-webkit-autofill:focus,
@@ -197,12 +198,116 @@
   margin-bottom: 1rem;
 }
 
-/* El color principal del botón se toma desde styles.css global */
 .full-btn {
   width: 100%;
   margin-top: 0.6rem;
   min-height: 48px;
   border-radius: 14px;
+}
+
+/* Registro estudiante */
+.register-box {
+  margin-top: 1.6rem;
+  padding-top: 1.35rem;
+  text-align: center;
+  border-top: 1px solid rgba(47, 125, 50, 0.18);
+}
+
+.register-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+  color: #1b5e20;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.register-divider::before,
+.register-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(47, 125, 50, 0.22);
+}
+
+.register-divider span {
+  padding: 0 0.8rem;
+  white-space: nowrap;
+}
+
+.register-box p {
+  margin: 0 0 1rem;
+  color: #4f6f52;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.btn-register {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 0.75rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(47, 125, 50, 0.32);
+  background: #f2fbef;
+  color: #1b5e20;
+  font-size: 0.92rem;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(27, 94, 32, 0.08);
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.btn-register:hover {
+  background: #e7f7e2;
+  border-color: rgba(47, 125, 50, 0.5);
+  box-shadow: 0 12px 24px rgba(27, 94, 32, 0.14);
+  transform: translateY(-1px);
+}
+
+/* Enlace alternativo, por si en otra pantalla usas auth-link */
+.auth-link {
+  margin: 1.4rem 0 0;
+  text-align: center;
+  color: #4f6f52;
+  font-size: 0.92rem;
+}
+
+.auth-link a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  margin-top: 0.75rem;
+  padding: 0.7rem 1rem;
+  width: 100%;
+  border-radius: 14px;
+  border: 1px solid rgba(47, 125, 50, 0.32);
+  background: #f2fbef;
+  color: #1b5e20;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 8px 18px rgba(27, 94, 32, 0.08);
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.auth-link a:hover {
+  background: #e7f7e2;
+  border-color: rgba(47, 125, 50, 0.5);
+  box-shadow: 0 12px 24px rgba(27, 94, 32, 0.14);
+  transform: translateY(-1px);
 }
 
 /* Responsive */
@@ -262,5 +367,14 @@
 
   .login-card .card-body {
     padding: 1.4rem;
+  }
+
+  .register-box {
+    margin-top: 1.35rem;
+    padding-top: 1.15rem;
+  }
+
+  .register-box p {
+    font-size: 0.86rem;
   }
 }
