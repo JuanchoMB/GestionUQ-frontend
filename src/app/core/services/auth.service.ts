@@ -4,8 +4,16 @@ import { BehaviorSubject, Observable, catchError, map, of, switchMap, tap } from
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
-import { AuthMeResponse, LoginRequest, LoginResponse, RegisterRequest } from '../models/auth.model';
 import { RolUsuario } from '../models/enums';
+import {
+  AuthMeResponse,
+  ForgotPasswordRequest,
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  VerifyResetCodeRequest,
+  ResetPasswordRequest
+} from '../models/auth.model';
 
 const TOKEN_KEY = 'triage_token';
 const USER_KEY = 'triage_user';
@@ -98,5 +106,21 @@ export class AuthService {
     } catch {
       return null;
     }
+  }
+  forgotPassword(request: ForgotPasswordRequest): Observable<void> {
+    return this.http.post<ApiResponse<void>>(`${this.baseUrl}/forgot-password`, request).pipe(
+      map(() => undefined)
+    );
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<void> {
+    return this.http.post<ApiResponse<void>>(`${this.baseUrl}/reset-password`, request).pipe(
+      map(() => undefined)
+    );
+  }
+  verifyResetCode(request: VerifyResetCodeRequest): Observable<void> {
+    return this.http.post<ApiResponse<void>>(`${this.baseUrl}/verify-reset-code`, request).pipe(
+      map(() => undefined)
+    );
   }
 }

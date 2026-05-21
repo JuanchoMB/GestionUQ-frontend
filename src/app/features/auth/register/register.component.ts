@@ -21,7 +21,7 @@ export class RegisterComponent implements AfterViewInit {
   private readonly alert = inject(AlertService);
   private readonly animation = inject(AnimationService);
 
-  private readonly institutionalEmailPattern = /^[A-Za-z0-9._%+-]+@uniquindio\.edu\.co$/;
+  private readonly institutionalEmailPattern = /^[A-Za-z0-9._%+-]+@uqvirtual\.edu\.co$/;
 
   @ViewChild('registerPage') registerPage?: ElementRef<HTMLElement>;
 
@@ -61,13 +61,13 @@ export class RegisterComponent implements AfterViewInit {
     const raw = this.form.getRawValue();
     const email = raw.email.trim().toLowerCase();
 
-    if (!email.endsWith('@uniquindio.edu.co')) {
+    if (!email.endsWith('@uqvirtual.edu.co')) {
       this.form.controls.email.setErrors({ institutionalEmail: true });
       this.form.controls.email.markAsTouched();
 
       this.alert.warning(
         'Correo no institucional',
-        'Debes registrarte con un correo que finalice en @uniquindio.edu.co.'
+        'Debes registrarte con un correo que finalice en @uqvirtual.edu.co.'
       );
 
       return;

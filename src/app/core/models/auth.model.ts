@@ -40,4 +40,18 @@ export interface RegisterRequest {
   identificacion: string;
   password: string;
 }
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  code: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+export interface VerifyResetCodeRequest {
+  email: string;
+  code: string;
+}
 
