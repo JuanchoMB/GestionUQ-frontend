@@ -3,7 +3,7 @@ import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, inject } from 
 import { RouterLink } from '@angular/router';
 import { SolicitudService } from '../../core/services/solicitud.service';
 import { AuthService } from '../../core/services/auth.service';
-import { EstadoSolicitud, Prioridad } from '../../core/models/enums';
+import { EstadoSolicitud } from '../../core/models/enums';
 import { Solicitud } from '../../core/models/solicitud.model';
 import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
 import { StatusBadgeComponent } from '../../shared/status-badge/status-badge.component';
@@ -14,16 +14,27 @@ import { AnimationService } from '../../core/services/animation.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink, LoadingSpinnerComponent, StatusBadgeComponent, PriorityBadgeComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    LoadingSpinnerComponent,
+    StatusBadgeComponent,
+    PriorityBadgeComponent
+  ],
   templateUrl: './dashboard.component.html'
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
   private readonly solicitudService = inject(SolicitudService);
+  private readonly animation = inject(AnimationService);
+
   readonly auth = inject(AuthService);
+
+  @ViewChild('dashboardPage') dashboardPage?: ElementRef<HTMLElement>;
 
   loading = true;
   error = '';
   solicitudes: Solicitud[] = [];
+
   label = labelEnum;
   formatDateTime = formatDateTime;
 
@@ -31,23 +42,53 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     this.load();
   }
 
+  ngAfterViewInit(): void {
+    this.animateDashboard();
+  }
+
   load(): void {
     this.loading = true;
     this.error = '';
+
     const request = this.auth.hasAnyRole(['ADMINISTRATIVO', 'COORDINADOR', 'CONSULTOR'])
       ? this.solicitudService.listar({ size: 100 })
       : this.solicitudService.misSolicitudes({ size: 100 });
 
     request.subscribe({
-      next: page => {
-        this.solicitudes = page.content;
+      next: (response: any) => {
+        this.solicitudes = this.extractSolicitudes(response);
         this.loading = false;
+
+        setTimeout(() => {
+          this.animateDashboard();
+        }, 100);
       },
       error: error => {
         this.error = extractErrorMessage(error);
+        this.solicitudes = [];
         this.loading = false;
       }
     });
+  }
+
+  private extractSolicitudes(response: any): Solicitud[] {
+    if (Array.isArray(response)) {
+      return response;
+    }
+
+    if (Array.isArray(response?.content)) {
+      return response.content;
+    }
+
+    if (Array.isArray(response?.data)) {
+      return response.data;
+    }
+
+    if (Array.isArray(response?.data?.content)) {
+      return response.data.content;
+    }
+
+    return [];
   }
 
   countByEstado(estado: EstadoSolicitud): number {
@@ -65,21 +106,22 @@ export class DashboardComponent implements OnInit, AfterViewInit {
   pending(): Solicitud[] {
     return this.solicitudes.filter(s => s.estado !== 'CERRADA').slice(0, 6);
   }
-  private readonly animation = inject(AnimationService);
 
-  @ViewChild('dashboardPage') dashboardPage?: ElementRef<HTMLElement>;
-
-  ngAfterViewInit(): void {
+  private animateDashboard(): void {
     setTimeout(() => {
       if (!this.dashboardPage) return;
 
       this.animation.pageEnter(this.dashboardPage.nativeElement);
 
       const cards = this.dashboardPage.nativeElement.querySelectorAll('.card');
-      this.animation.cardsEnter(cards);
+      if (cards.length > 0) {
+        this.animation.cardsEnter(cards);
+      }
 
       const rows = this.dashboardPage.nativeElement.querySelectorAll('tbody tr, .timeline-item');
-      this.animation.rowsEnter(rows);
+      if (rows.length > 0) {
+        this.animation.rowsEnter(rows);
+      }
     }, 120);
   }
 }
