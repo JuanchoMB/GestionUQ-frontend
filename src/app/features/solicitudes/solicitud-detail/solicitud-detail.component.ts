@@ -226,10 +226,16 @@ export class SolicitudDetailComponent implements OnInit, AfterViewChecked {
       fechaLimite: this.solicitud.fechaLimite || null
     }).subscribe({
       next: response => {
-        this.prioridadSugerida = response;
+        const razonesLimpias = this.limpiarRazonesTecnicas(response.razones || []);
+
+        this.prioridadSugerida = {
+          ...response,
+          razones: razonesLimpias
+        };
 
         this.clasificarForm.patchValue({
-          prioridad: response.prioridadSugerida
+          prioridad: response.prioridadSugerida,
+          justificacionPrioridad: ''
         });
 
         this.success = 'Prioridad sugerida. Puedes confirmar o ajustar antes de clasificar.';
@@ -237,7 +243,7 @@ export class SolicitudDetailComponent implements OnInit, AfterViewChecked {
 
         this.alert.success(
           'Sugerencia generada',
-          'Gemini generó una prioridad sugerida para esta solicitud.'
+          'Se generó una prioridad sugerida para esta solicitud.'
         );
       },
       error: error => {
@@ -382,9 +388,6 @@ export class SolicitudDetailComponent implements OnInit, AfterViewChecked {
           'Resumen generado',
           'Se generó un resumen asistido de la solicitud.'
         );
-
-        // No llamamos this.load() aquí porque puede refrescar el componente
-        // y afectar la visualización del resumen recién generado.
       },
       error: error => {
         console.error('ERROR AL GENERAR RESUMEN:', error);
@@ -411,6 +414,20 @@ export class SolicitudDetailComponent implements OnInit, AfterViewChecked {
     if (value.includes('cerr')) return '🔒';
 
     return '•';
+  }
+
+  private limpiarRazonesTecnicas(razones: string[]): string[] {
+    return razones.filter(razon => {
+      const texto = razon.toLowerCase();
+
+      return (
+        !texto.includes('gemini api no disponible') &&
+        !texto.includes('cuota excedida') &&
+        !texto.includes('quota exceeded') &&
+        !texto.includes('fallback local') &&
+        !texto.includes('api no disponible')
+      );
+    });
   }
 
   private runAction(obs: any, message: string): void {
@@ -498,5 +515,4 @@ export class SolicitudDetailComponent implements OnInit, AfterViewChecked {
       });
     }
   }
-
 }
