@@ -30,8 +30,9 @@ export interface SolicitudCreate {
   canalOrigen: CanalOrigen;
   impactoAcademico?: ImpactoAcademico | null;
   fechaLimite?: string | null;
+  prioridad?: Prioridad | null;
+  justificacionPrioridad?: string | null;
 }
-
 export interface FiltroSolicitudes {
   page?: number;
   size?: number;
@@ -112,6 +113,8 @@ export interface SugerirClasificacionPrioridadRequest {
 export interface SugerirClasificacionPrioridadResponse {
   tipoSolicitudSugerido: TipoSolicitud;
   prioridadSugerida: Prioridad;
+  canalOrigenSugerido?: CanalOrigen | null;
+  impactoAcademicoSugerido?: ImpactoAcademico | null;
   confianza?: number;
   puntajeTotal?: number;
   razones: string[];

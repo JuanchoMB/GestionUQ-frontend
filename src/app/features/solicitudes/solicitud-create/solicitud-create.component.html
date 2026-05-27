@@ -39,6 +39,7 @@
       <form class="form-grid" [formGroup]="form" (ngSubmit)="submit()">
         <div class="form-row">
           <label for="tipoSolicitud">Tipo de solicitud</label>
+
           <select id="tipoSolicitud" formControlName="tipoSolicitud">
             <option value="">Selecciona un tipo</option>
             <option *ngFor="let tipo of tipos" [value]="tipo">
@@ -56,21 +57,37 @@
 
         <div class="form-row">
           <label for="canalOrigen">Canal de origen</label>
+
           <select id="canalOrigen" formControlName="canalOrigen">
             <option *ngFor="let canal of canales" [value]="canal">
               {{ label(canal) }}
             </option>
           </select>
+
+          <small
+            class="helper"
+            *ngIf="suggestion?.canalOrigenSugerido as canalSugerido"
+          >
+            Canal sugerido por IA: {{ label(canalSugerido) }}
+          </small>
         </div>
 
         <div class="form-row">
           <label for="impactoAcademico">Impacto académico</label>
+
           <select id="impactoAcademico" formControlName="impactoAcademico">
             <option value="">Sin especificar</option>
             <option *ngFor="let impacto of impactos" [value]="impacto">
               {{ label(impacto) }}
             </option>
           </select>
+
+          <small
+            class="helper"
+            *ngIf="suggestion?.impactoAcademicoSugerido as impactoSugerido"
+          >
+            Impacto académico sugerido por IA: {{ label(impactoSugerido) }}
+          </small>
         </div>
 
         <div class="form-row datepicker-row">
@@ -189,8 +206,24 @@
           </small>
         </div>
 
+        <div class="form-row">
+          <label for="prioridad">Prioridad sugerida</label>
+
+          <select id="prioridad" formControlName="prioridad">
+            <option value="">Sin sugerencia</option>
+            <option *ngFor="let prioridad of prioridades" [value]="prioridad">
+              {{ label(prioridad) }}
+            </option>
+          </select>
+
+          <small class="helper">
+            Se llena automáticamente al confirmar la sugerencia con IA.
+          </small>
+        </div>
+
         <div class="form-row full">
           <label for="descripcion">Descripción</label>
+
           <textarea
             id="descripcion"
             formControlName="descripcion"
@@ -205,17 +238,26 @@
           </small>
         </div>
 
-        <div class="alert alert-info full" *ngIf="suggestion">
+        <div class="alert alert-info full" *ngIf="suggestion as s">
           <strong>Sugerencia asistida:</strong>
-          tipo {{ label(suggestion.tipoSolicitudSugerido) }},
-          prioridad {{ label(suggestion.prioridadSugerida) }}
-          <span *ngIf="suggestion.confianza">
-            , confianza {{ suggestion.confianza | percent:'1.0-0' }}
+          tipo {{ label(s.tipoSolicitudSugerido) }},
+          prioridad {{ label(s.prioridadSugerida) }}
+
+          <span *ngIf="s.canalOrigenSugerido as canalSugerido">
+            , canal {{ label(canalSugerido) }}
+          </span>
+
+          <span *ngIf="s.impactoAcademicoSugerido as impactoSugerido">
+            , impacto académico {{ label(impactoSugerido) }}
+          </span>
+
+          <span *ngIf="s.confianza">
+            , confianza {{ s.confianza | percent:'1.0-0' }}
           </span>.
           <br />
 
           <span>
-            Razones: {{ suggestion.razones.join(' · ') }}
+            Razones: {{ s.razones.join(' · ') }}
           </span>
 
           <div class="actions" style="margin-top: 10px;">
@@ -224,7 +266,7 @@
               type="button"
               (click)="applySuggestion()"
             >
-              Confirmar tipo sugerido
+              Confirmar sugerencia
             </button>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { SolicitudService } from '../../../core/services/solicitud.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { CANALES_ORIGEN, IMPACTOS_ACADEMICOS, TIPOS_SOLICITUD } from '../../../core/models/enums';
+import { CANALES_ORIGEN, IMPACTOS_ACADEMICOS, PRIORIDADES, TIPOS_SOLICITUD } from '../../../core/models/enums';
 import { extractErrorMessage, labelEnum } from '../../../core/utils/labels';
 import { SugerirClasificacionPrioridadResponse } from '../../../core/models/solicitud.model';
 import { AlertService } from '../../../core/services/alert.service';
@@ -26,6 +26,7 @@ export class SolicitudCreateComponent {
   tipos = TIPOS_SOLICITUD;
   canales = CANALES_ORIGEN;
   impactos = IMPACTOS_ACADEMICOS;
+  prioridades = PRIORIDADES;
   label = labelEnum;
 
   loading = false;
@@ -62,7 +63,8 @@ export class SolicitudCreateComponent {
     descripcion: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(2000)]],
     canalOrigen: ['CORREO', Validators.required],
     impactoAcademico: ['MEDIO'],
-    fechaLimite: ['', [Validators.required]]
+    fechaLimite: ['', [Validators.required]],
+    prioridad: [{ value: '', disabled: true }]
   });
 
   get selectedDateLabel(): string {
@@ -235,8 +237,21 @@ export class SolicitudCreateComponent {
     }
 
     this.form.patchValue({
-      tipoSolicitud: this.suggestion.tipoSolicitudSugerido
+      tipoSolicitud: this.suggestion.tipoSolicitudSugerido,
+      prioridad: this.suggestion.prioridadSugerida,
+      canalOrigen: this.suggestion.canalOrigenSugerido || this.form.controls.canalOrigen.value,
+      impactoAcademico: this.suggestion.impactoAcademicoSugerido || this.form.controls.impactoAcademico.value
     });
+
+    this.form.controls.tipoSolicitud.markAsTouched();
+    this.form.controls.canalOrigen.markAsTouched();
+    this.form.controls.impactoAcademico.markAsTouched();
+    this.form.controls.prioridad.markAsTouched();
+
+    this.alert.success(
+      'Sugerencia aplicada',
+      'Se aplicaron el tipo de solicitud, la prioridad, el canal de origen y el impacto académico sugeridos.'
+    );
   }
 
   submit(): void {
@@ -275,7 +290,9 @@ export class SolicitudCreateComponent {
       descripcion: raw.descripcion || '',
       canalOrigen: raw.canalOrigen as any,
       impactoAcademico: raw.impactoAcademico ? raw.impactoAcademico as any : null,
-      fechaLimite
+      fechaLimite,
+      prioridad: raw.prioridad ? raw.prioridad as any : null,
+      justificacionPrioridad: this.suggestion?.razones?.join(' · ') || null
     }).subscribe({
       next: solicitud => {
         this.alert.close();
