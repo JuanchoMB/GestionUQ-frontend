@@ -90,7 +90,7 @@ export class SolicitudCreateComponent {
   }
 
   canSuggest(): boolean {
-    return this.auth.hasAnyRole(['ADMINISTRATIVO', 'COORDINADOR']);
+    return this.auth.hasAnyRole(['ESTUDIANTE', 'ADMINISTRATIVO', 'COORDINADOR']);
   }
 
   toggleCalendar(): void {
